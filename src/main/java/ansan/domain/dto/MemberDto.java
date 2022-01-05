@@ -1,0 +1,40 @@
+package ansan.domain.dto;
+
+
+import ansan.domain.entity.Member.MemberEntity;
+import lombok.*;
+
+@NoArgsConstructor // 깡통생성자
+@AllArgsConstructor // 풀 생성자
+@Getter // Get 메소드
+@Setter // Set 메소드
+@ToString // 객체주소정보 - > 객체내 필드
+@Builder
+public class MemberDto {
+    // 필드
+    private int m_num; // 회원번호
+    private String m_id;  // 회원아이디
+    private String m_password; // 비밀번호
+    private String m_name; // 이름
+    private String m_sex; // 성별
+    private String m_phone; // 연락처
+    private String m_email; // 이메일
+    private String m_address; // 주소
+    private int m_point; // 포인트
+    private String m_grade; // 등급
+
+   // DTO -> Entity 변환  [ 빌더로 대체 가능 ]
+    public MemberEntity toentity() {
+        return MemberEntity.builder()
+        .m_id(this.m_id)
+        .m_password(this.m_password)
+                .m_name(this.m_name)
+                .m_sex(this.m_sex)
+                .m_phone(this.m_phone)
+                .m_email(this.m_email)
+                .m_point(this.m_point)
+                .m_grade(this.m_grade).build();
+
+    }
+
+}
