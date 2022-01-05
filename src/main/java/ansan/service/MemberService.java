@@ -93,9 +93,9 @@ public class MemberService {
                 try {
                     MimeMessage message = javaMailSender.createMimeMessage();
                     MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true, "utf-8");
-                    mimeMessageHelper.setFrom(from, "Ansan");
-                    mimeMessageHelper.setTo(to);
-                    mimeMessageHelper.setSubject(subject);
+                    mimeMessageHelper.setFrom("slal4952@naver.com", "Ansan");
+                    mimeMessageHelper.setTo("slal4952@naver.com");
+                    mimeMessageHelper.setSubject("Ansan 계정 임시 비밀번호 발송");
                     mimeMessageHelper.setText(body.toString(), true);
                     javaMailSender.send(message);
                 }
@@ -105,6 +105,4 @@ public class MemberService {
         }
         return false;
     }
-
-
 }
