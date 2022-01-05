@@ -21,6 +21,7 @@ dependencies {  // 의존성 [ 라이브러리 추가하는 공간 ]
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // jpa 라이브러리
     runtimeOnly 'mysql:mysql-connector-java' // mysql 라이브러라
     developmentOnly 'org.springframework.boot:spring-boot-devtools' // 자동빌드 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // 자바메일 라이브러리;
 }
 
 test {
