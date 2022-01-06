@@ -1,7 +1,7 @@
 function login() {
 
-var m_id = $("#m_id").val();
-var m_password = $("#m_password").val();
+var m_id = $("#login_m_id").val();
+var m_password = $("#login_m_password").val();
 var memberdto = {"m_id" : m_id, "m_password" : m_password};
 
 

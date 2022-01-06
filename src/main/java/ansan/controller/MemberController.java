@@ -6,10 +6,7 @@ import ansan.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -33,6 +30,20 @@ public class MemberController {
         return "member/findid";
     }
 
+    @GetMapping("/member/info")
+    public String info(Model model) {
+        // 로그인 세션 호출
+        HttpSession session = request.getSession();
+        MemberDto loginDto = (MemberDto)session.getAttribute("logindto");
+
+        // 세션에 회원번호를 service에 전달해서 동일한 회원번호에 회원정보 가져오기
+        MemberDto memberDto = memberService.getmemberDto(loginDto.getM_num());
+        // 가져온 회원정보를 view에 전달
+        model.addAttribute("memberDto", memberDto);
+
+        return "member/info";
+    }
+
     @Autowired
     MemberService memberService;
 
@@ -40,11 +51,15 @@ public class MemberController {
     HttpServletRequest request; // 요청객체 jsp : 내장객체
 
     @PostMapping("/member/signupcontroller") // 회원가입 처리 연결
-    public String signupController(MemberDto memberDto) {
+    public String signupController(MemberDto memberDto,
+                                   @RequestParam("address1") String address1,
+                                   @RequestParam("address2") String address2,
+                                   @RequestParam("address3") String address3,
+                                   @RequestParam("address4") String address4) {
+        memberDto.setM_address(address1 + "/" + address2 + "/" + address3 + "/" + address4);
         // 자동 중비 : form 입력한 name과 dto의 필드명 동일하면 자동주입
         // 입력이 없는 필드는 초기값 [ 문자 = null, 숫자 = 0]
         memberService.membersignup(memberDto);
-
         return "redirect:/"; // 회원가입 성공시 로그인페이지 맵핑
     }
 
@@ -76,12 +91,12 @@ public class MemberController {
     @PostMapping("/member/findidcontroller")
     public String findidcontroller(MemberDto memberDto, Model model) {
         String result = memberService.findid(memberDto);
-        if( result != null ) {
+        if (result != null) {
             String msg = "회원님의 아이디는 : " + result;
             model.addAttribute("findidmsg", msg);
         } else {
             String msg = "동일한 회원정보가 없습니다.";
-            model.addAttribute("findidmsg" , msg);
+            model.addAttribute("findidmsg", msg);
         }
         return "/member/findid";
     }
@@ -90,13 +105,54 @@ public class MemberController {
     @PostMapping("/member/findpasswordcontroller")
     public String findpasswordcontroller(MemberDto memberDto, Model model) {
         boolean result = memberService.findpassword(memberDto);
-        if(result) {
+        if (result) {
             String msg = "가입하신 이메일로 임시비밀번호를 발송했습니다.";
             model.addAttribute("findpwmsg", msg);
-        }else {
+        } else {
             String msg = "비밀번호를 찾을 수 없습니다.";
-            model.addAttribute("findpwmsg" , msg);
+            model.addAttribute("findpwmsg", msg);
         }
         return "/member/findid";
     }
+
+    // 아이디 중복체크
+    @PostMapping("/member/idcheck")
+    @ResponseBody
+    public int idcheck(@RequestParam("m_id") String m_id) {
+        boolean result = memberService.idcheck(m_id);
+        if (result) {
+            return 1; // 중복
+        } else {
+            return 2; // 노중복
+        }
+    }
+
+    @PostMapping("/member/emailcheck")
+    @ResponseBody
+    public int emailcheck(@RequestParam("m_email") String m_email) {
+        boolean result = memberService.emailcheck(m_email);
+        if (result) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    // 회원탈퇴
+    @GetMapping("/member/mdelete")
+    @ResponseBody
+    public int mdelete(@RequestParam("passwordconfirm") String passwordconfirm) {
+
+        HttpSession session = request.getSession();
+        MemberDto memberDto = (MemberDto)session.getAttribute("logindto");
+        // 로그인된 회원번호와 입력한 패스워드를 service로 보낸다.
+        boolean result = memberService.delete(memberDto.getM_num(), passwordconfirm);
+        // 결과를 ajax에게 전달
+        if(result) {
+            return 1;
+        }else {
+            return 2;
+        }
+    }
+
 }

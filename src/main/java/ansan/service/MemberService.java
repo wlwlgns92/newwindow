@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -104,5 +105,66 @@ public class MemberService {
             }
         }
         return false;
+    }
+
+    // 아이디 중복체크
+    public boolean idcheck ( String m_id ) {
+        //모든 엔티티 가져오기
+        List<MemberEntity> memberEntities = memberRepository.findAll();
+        // 모든 엔티티 반복문 돌려서 엔티티 하나씩 가져오기
+        for(MemberEntity memberEntity : memberEntities) {
+            //만약에  해당 엔티티가 입력한 아이디와 동일하면
+            if(memberEntity.getM_id().equals(m_id)) {
+                return true; // 중복
+            }
+        }
+        return false; // 중복없음
+    }
+
+    // 이메일 중복체크
+    public boolean emailcheck ( String m_email) {
+        List<MemberEntity> memberEntities = memberRepository.findAll();
+        for(MemberEntity memberEntity : memberEntities) {
+            if(memberEntity.getM_email().equals(m_email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 회원번호 -> 회원정보 반환
+    public MemberDto getmemberDto(int m_num) {
+        // memberRepository.findAll(); 모든 엔티티 호출
+        // memberRepository.findById(pk값); 해당 pk값의 엔티티 호출
+        // 해당 회원번호[pk]만 엔티티 호출
+        Optional<MemberEntity> memberEntity = memberRepository.findById(m_num);
+
+        // 찾은 엔티티를 dto로 변경후 반환
+        MemberDto memberDto = new MemberDto();
+        return memberDto.builder()
+                .m_id(memberEntity.get().getM_id())
+                .m_email(memberEntity.get().getM_email())
+                .m_grade(memberEntity.get().getM_grade())
+                .m_name(memberEntity.get().getM_name())
+                .m_phone(memberEntity.get().getM_phone())
+                .m_sex(memberEntity.get().getM_sex())
+                .m_point(memberEntity.get().getM_point())
+                .m_address(memberEntity.get().getM_address())
+                .m_createdDate(memberEntity.get().getCreatedDate()).build();
+    }
+
+    // 회원탈퇴
+    public boolean delete(int m_num, String passwordconfirm) {
+        // 로그인된 회원번호의 엔티티 호출
+        Optional<MemberEntity> memberEntity = memberRepository.findById(m_num);
+        // Optional 클래스 null 포함 객체 저장
+            // memberEntity.get() : Optional 내 객체 호출
+        // 해당 엔티티내 패스워드가 확인 패스워드와 같다면
+        if(memberEntity.get().getM_password().equals(passwordconfirm)) {
+            memberRepository.delete(memberEntity.get());
+            return true; // 회원탈퇴
+        }else {
+            return false; // 다르면 false
+        }
     }
 }

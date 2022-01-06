@@ -4,6 +4,8 @@ package ansan.domain.dto;
 import ansan.domain.entity.Member.MemberEntity;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor // 깡통생성자
 @AllArgsConstructor // 풀 생성자
 @Getter // Get 메소드
@@ -22,6 +24,7 @@ public class MemberDto {
     private String m_address; // 주소
     private int m_point; // 포인트
     private String m_grade; // 등급
+    private LocalDateTime m_createdDate;
 
    // DTO -> Entity 변환  [ 빌더로 대체 가능 ]
     public MemberEntity toentity() {
@@ -33,7 +36,9 @@ public class MemberDto {
                 .m_phone(this.m_phone)
                 .m_email(this.m_email)
                 .m_point(this.m_point)
-                .m_grade(this.m_grade).build();
+                .m_address(this.m_address)
+                .m_grade(this.m_grade)
+                .build();
 
     }
 
