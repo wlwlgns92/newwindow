@@ -100,7 +100,7 @@ public class MemberService {
                     mimeMessageHelper.setText(body.toString(), true);
                     javaMailSender.send(message);
                 }
-                catch (Exception e) { System.out.println("메일전송 실패 "); }
+                catch (Exception e) { System.out.println("메일전송 실패 " + e); }
                 return true; // 아이디를 반환
             }
         }
