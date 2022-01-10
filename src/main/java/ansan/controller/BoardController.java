@@ -29,7 +29,7 @@ public class BoardController {
     @PostMapping("/board/boardwritecontroller")
     public String boardwritecontroller(BoardDto boardDto) {
         boardService.boardwrite(boardDto);
-        return "redirect:board/boardlist"; // 작성 성공시 list로 이동
+        return "redirect:/board/boardlist"; // 작성 성공시 list로 이동
     }
 
 }
