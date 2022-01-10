@@ -70,8 +70,8 @@ public class MemberService {
             if (memberEntity.getM_id().equals(memberDto.getM_id()) &&
                     memberEntity.getM_email().equals(memberDto.getM_email())) {
 
-                String to = "slal4952@naver.com"; // 보내는사람
-                String from = memberEntity.getM_email(); // 받는 사람
+                String from = "slal4952@naver.com"; // 보내는사람
+                String to = memberEntity.getM_email(); // 받는 사람
                 String subject = "Ansan 계정 임시 비밀번호 발송"; // 제목
                 StringBuilder body = new StringBuilder(); // StringBuilder 문자열 연결 클래스 [ 문자열1 + 문자열 2 ]
                 body.append("<html> <body> <h1>Ansan 계정 임시 비밀번호<h1>"); // 보내는 메시지에 html 추가
@@ -95,7 +95,7 @@ public class MemberService {
                     MimeMessage message = javaMailSender.createMimeMessage();
                     MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true, "utf-8");
                     mimeMessageHelper.setFrom(from, "Ansan");
-                    mimeMessageHelper.setTo("slal4952@naver.com");
+                    mimeMessageHelper.setTo(to);
                     mimeMessageHelper.setSubject("Ansan 계정 임시 비밀번호 발송");
                     mimeMessageHelper.setText(body.toString(), true);
                     javaMailSender.send(message);
