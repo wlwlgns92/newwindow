@@ -98,7 +98,7 @@ public class MemberController {
             String msg = "동일한 회원정보가 없습니다.";
             model.addAttribute("findidmsg", msg);
         }
-        return "/member/findid";
+        return "member/findid";
     }
 
     //비밀번호 찾기
@@ -112,7 +112,7 @@ public class MemberController {
             String msg = "비밀번호를 찾을 수 없습니다.";
             model.addAttribute("findpwmsg", msg);
         }
-        return "/member/findid";
+        return "member/findid";
     }
 
     // 아이디 중복체크
