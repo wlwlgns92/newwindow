@@ -7,6 +7,7 @@ import ansan.domain.entity.Board.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +52,8 @@ public class BoardService {
                     boardEntity.getB_content(),
                     boardEntity.getB_writer(),
                     date,
-                    boardEntity.getB_view()
+                    boardEntity.getB_view(),
+                    boardEntity.getB_img()
                     );
             boardDtos.add(boardDto);
         }
@@ -72,6 +74,35 @@ public class BoardService {
                 .b_content(entityOptional.get().getB_content())
                 .b_writer(entityOptional.get().getB_writer())
                 .b_view(entityOptional.get().getB_view())
+                .b_img(entityOptional.get().getB_img())
                 .build();
     }
+
+    // 게시물삭제
+    public boolean bdelete(int b_num) {
+        Optional<BoardEntity> boardEntity = boardRepository.findById(b_num);
+        if(boardEntity.get() != null) {
+            boardRepository.delete(boardEntity.get());
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    // 게시물 수정
+    @Transactional // 수정중 오류 발생시 rollback : 취소
+    public boolean boardupdate( BoardDto boardDto ) {
+        try {
+            // 수정할 엔티티 찾기
+            Optional<BoardEntity> entityOptional = boardRepository.findById(boardDto.getB_num());
+            // 엔티티 수정
+            entityOptional.get().setB_title(boardDto.getB_title());
+            entityOptional.get().setB_content(boardDto.getB_content());
+            return true;
+        }catch (Exception e) {
+            System.out.println("수정실패 : " + e);
+            return false;
+        }
+    }
+    
 }

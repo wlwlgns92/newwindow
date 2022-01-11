@@ -1,7 +1,6 @@
 package ansan.domain.entity.Board;
 
 
-
 import ansan.domain.entity.BaseTimeEntity;
 import lombok.*;
 
@@ -28,6 +27,8 @@ public class BoardEntity extends BaseTimeEntity {
     private String b_writer;
     @Column(name="b_view")
     private String b_view;
+    @Column(name="b_img")
+    private String b_img;
 
 
 }
