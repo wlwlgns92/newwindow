@@ -7,6 +7,9 @@
 <body>
     <div th:replace="header.html::header"> </div>
     <div class="container">
+        <!-- session을 호출해 logindto가 null이 아닐경우에만 글쓰기 버튼 가능 -->
+        <div th:if="${session.logindto == null}"> 로그인후 글쓰기 가능합니다. </div>
+        <a th:if="${session.logindto != null}" th:href="@{/board/boardwrite}"><button class="btn btn-primary">글 쓰기</button></a>
         <table class="table">
             <thead>
                 <tr>
@@ -20,7 +23,13 @@
             <tbody>
                 <tr th:each="boardDto : ${BoardDtos}">
                     <td th:text="${boardDto.b_num}"></td>
-                    <td th:text="${boardDto.b_title}"></td>
+                    <!-- 제목에 하이퍼링크 걸기 td를 하이퍼링크로 설정할 수는 없어서 span을 이용해 제목을 출력 후 a태그를 사용한다. -->
+                    <td><!-- <a th:href="@{'/기존경로/URL' + ${변수} }"> -->
+                        <a th:href="@{'/board/boardview/' + ${boardDto.b_num} }"> <!-- URL을 요청할때는 맨 앞에 /를 넣어야 한다. -->
+                        <span th:text="${boardDto.b_title}"></span>
+                        </a>
+                    </td>
+
                     <td th:text="${boardDto.b_content}"></td>
                     <td th:text="${boardDto.b_writer}"></td>
                     <td th:text="${boardDto.b_createdDate}"></td>
@@ -29,7 +38,7 @@
             </tbody>
 
         </table>
-        <a th:href="@{/board/boardwrite}"><button class="btn btn-primary">글 쓰기</button></a>
+
     </div>
 </body>
 </html>

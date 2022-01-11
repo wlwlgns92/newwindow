@@ -4,8 +4,6 @@ package ansan.domain.dto;
 import ansan.domain.entity.Board.BoardEntity;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,7 +16,7 @@ public class BoardDto {
     private String b_title;
     private String b_content;
     private String b_writer;
-    private LocalDateTime b_createdDate;
+    private String b_createdDate;
     private String b_view;
 
     // Dto - > Entity 변환
