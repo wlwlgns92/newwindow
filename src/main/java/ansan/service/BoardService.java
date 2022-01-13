@@ -5,14 +5,14 @@ import ansan.domain.dto.BoardDto;
 import ansan.domain.entity.Board.BoardEntity;
 import ansan.domain.entity.Board.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,40 +25,59 @@ public class BoardService {
         boardRepository.save(boardDto.toentity()); // save(entity) : insert , update
         return true;
     }
+    // 게시물 리스트 [ 페이징 처리 ]
+    public Page<BoardEntity> boardlist (Pageable pageable, String keyword, String search) {
+        // pageable = PageRequest.of(1,10); // 2번째 페이지 게시물 10개 출력
 
-    // 게시물 리스트
-    public ArrayList<BoardDto> boardlist() {
-        
-        // 게시물 번호로 정렬해서 엔티티 호출
-        // SQL : Select * from board order by 필드명 DESC
-        // JPA : findAll( Sort.by(Sort.Direction.DESC, "Entity 필드명") ) ;
-        List<BoardEntity> boardEntities = boardRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"));
-        ArrayList<BoardDto> boardDtos = new ArrayList<>();
-        for(BoardEntity boardEntity : boardEntities) {
+        //만약에 검색이 있을경우
+        if(keyword != null && keyword.equals("b_title")) return boardRepository.findAlltitle(search, pageable);
+        if(keyword != null && keyword.equals("b_content")) return boardRepository.findAllcontent(search, pageable);
+        if(keyword != null && keyword.equals("b_writer")) return boardRepository.findAllwriter(search, pageable);
 
-            // 날짜 형변환 [ localdate -> String ]
-                // LocalDateTime.format() : LocalDateTime
-            String date = boardEntity.getCreatedDate().format(DateTimeFormatter.ofPattern("yy-MM-dd"));
-            // 오늘날짜
-            String nowdate = LocalDateTime.now().format( DateTimeFormatter.ofPattern("yy-MM-dd") );
-            // 만약에 게시물 작성일이 오늘이면 시간을 출력 아니면 날짜를 출력
-            if(date.equals(nowdate)){
-                // 오늘날짜
-                date = boardEntity.getCreatedDate().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
-            }
-            BoardDto boardDto = new BoardDto(
-                    boardEntity.getB_num(),
-                    boardEntity.getB_title(),
-                    boardEntity.getB_content(),
-                    boardEntity.getB_writer(),
-                    date,
-                    boardEntity.getB_view(),
-                    boardEntity.getB_img()
-                    );
-            boardDtos.add(boardDto);
+        int page = 0;
+        if(pageable.getPageNumber() == 0) {
+            page = 0;
+        }else {
+            page = pageable.getPageNumber()-1;
         }
-        return boardDtos;
+        pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "createdDate")); // 변수 페이지 10개 출력
+
+        return boardRepository.findAll(pageable);
     }
+    // 게시물 리스트
+//    public ArrayList<BoardDto> boardlist() {
+//
+//        // 게시물 번호로 정렬해서 엔티티 호출
+//        // SQL : Select * from board order by 필드명 DESC
+//        // JPA : findAll( Sort.by(Sort.Direction.DESC, "Entity 필드명") ) ;
+//        List<BoardEntity> boardEntities = boardRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"));
+//        ArrayList<BoardDto> boardDtos = new ArrayList<>();
+//        for(BoardEntity boardEntity : boardEntities) {
+//
+//            // 날짜 형변환 [ localdate -> String ]
+//                // LocalDateTime.format() : LocalDateTime
+//            String date = boardEntity.getCreatedDate().format(DateTimeFormatter.ofPattern("yy-MM-dd"));
+//            // 오늘날짜
+//            String nowdate = LocalDateTime.now().format( DateTimeFormatter.ofPattern("yy-MM-dd") );
+//            // 만약에 게시물 작성일이 오늘이면 시간을 출력 아니면 날짜를 출력
+//            if(date.equals(nowdate)){
+//                // 오늘날짜
+//                date = boardEntity.getCreatedDate().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+//            }
+//            BoardDto boardDto = new BoardDto(
+//                    boardEntity.getB_num(),
+//                    boardEntity.getB_title(),
+//                    boardEntity.getB_content(),
+//                    boardEntity.getB_writer(),
+//                    date,
+//                    boardEntity.getB_view(),
+//                    boardEntity.getB_img(),
+//                    null
+//                    );
+//            boardDtos.add(boardDto);
+//        }
+//        return boardDtos;
+//    }
 
     // boardview 출력
     public BoardDto getboard(int b_num) {

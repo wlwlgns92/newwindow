@@ -19,6 +19,7 @@ public class BoardDto {
     private String b_createdDate;
     private String b_view;
     private String b_img;
+    private String b_realimg;
 
     // Dto - > Entity 변환
     public BoardEntity toentity() {
