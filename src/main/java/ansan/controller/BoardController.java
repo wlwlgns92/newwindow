@@ -103,7 +103,6 @@ public class BoardController {
     // 게시물 수정 처리
     @PostMapping("/board/boardcontroller")
     public String boardupdatecontroller(BoardDto boardDto){
-        System.out.println(boardDto.getB_num());
         boolean result = boardService.boardupdate(boardDto);
         if(result) {
             return "board/boardview";

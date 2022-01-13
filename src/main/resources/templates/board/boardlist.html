@@ -22,6 +22,7 @@
             </thead>
             <tbody>
                 <tr th:each="boardDto : ${BoardDtos}">
+                    <!-- for( 클래스명 객체명 : 리스트명 ) -->
                     <td th:text="${boardDto.b_num}"></td>
                     <!-- 제목에 하이퍼링크 걸기 td를 하이퍼링크로 설정할 수는 없어서 span을 이용해 제목을 출력 후 a태그를 사용한다. -->
                     <td><!-- <a th:href="@{'/기존경로/URL' + ${변수} }"> -->
