@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -29,18 +31,21 @@ public class BoardService {
     public Page<BoardEntity> boardlist (Pageable pageable, String keyword, String search) {
         // pageable = PageRequest.of(1,10); // 2번째 페이지 게시물 10개 출력
 
+
+        int page = 0;
+        if(pageable.getPageNumber() == 0) { // 0이면 1페이지
+            page = 0;
+        }else {
+            page = pageable.getPageNumber()-1; // 1이면 -1 1페이지 2이면 -1 2페이지
+        }
+        // 페이지 속성 [ PageRequest.of(페이지번호, 페이지 게시물수, 정렬기준)
+        pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "bnum")); // 변수 페이지 10개 출력
+
         //만약에 검색이 있을경우
         if(keyword != null && keyword.equals("b_title")) return boardRepository.findAlltitle(search, pageable);
         if(keyword != null && keyword.equals("b_content")) return boardRepository.findAllcontent(search, pageable);
         if(keyword != null && keyword.equals("b_writer")) return boardRepository.findAllwriter(search, pageable);
 
-        int page = 0;
-        if(pageable.getPageNumber() == 0) {
-            page = 0;
-        }else {
-            page = pageable.getPageNumber()-1;
-        }
-        pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "createdDate")); // 변수 페이지 10개 출력
 
         return boardRepository.findAll(pageable);
     }
@@ -65,7 +70,7 @@ public class BoardService {
 //                date = boardEntity.getCreatedDate().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
 //            }
 //            BoardDto boardDto = new BoardDto(
-//                    boardEntity.getB_num(),
+//                    boardEntity.getBnum(),
 //                    boardEntity.getB_title(),
 //                    boardEntity.getB_content(),
 //                    boardEntity.getB_writer(),
@@ -78,17 +83,32 @@ public class BoardService {
 //        }
 //        return boardDtos;
 //    }
-
+    @Autowired
+    HttpServletRequest request;
     // boardview 출력
+    @Transactional  //Read 빼고는 다 넣는다.
     public BoardDto getboard(int b_num) {
 
         Optional<BoardEntity> entityOptional = boardRepository.findById(b_num);
 
         String date = entityOptional.get().getCreatedDate().format(DateTimeFormatter.ofPattern("yy-MM-dd"));
 
+        // 조회수
+        entityOptional.get().setB_view(entityOptional.get().getB_view()+1);
+        // 조회수 중복방지 [ 세션을 이용한 ]
+        HttpSession session = request.getSession();
+        if(session.getAttribute(b_num+"")==null) { // 만약에 기존에 조회수 증가를 안했으면
+            // 조회수 변경
+            entityOptional.get().setB_view(entityOptional.get().getB_view());
+            // 세션부여
+            session.setAttribute(b_num+"", 1);
+            // 해당 세션 시간 [ 1초 ]
+            session.setMaxInactiveInterval(60*60*24);
+        }
+
         return BoardDto.builder()
                 .b_createdDate(date)
-                .b_num(entityOptional.get().getB_num())
+                .b_num(entityOptional.get().getBnum())
                 .b_title(entityOptional.get().getB_title())
                 .b_content(entityOptional.get().getB_content())
                 .b_writer(entityOptional.get().getB_writer())
@@ -117,6 +137,7 @@ public class BoardService {
             // 엔티티 수정
             entityOptional.get().setB_title(boardDto.getB_title());
             entityOptional.get().setB_content(boardDto.getB_content());
+            entityOptional.get().setB_img(boardDto.getB_img());
             return true;
         }catch (Exception e) {
             System.out.println("수정실패 : " + e);

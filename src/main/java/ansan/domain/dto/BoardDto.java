@@ -17,7 +17,7 @@ public class BoardDto {
     private String b_content;
     private String b_writer;
     private String b_createdDate;
-    private String b_view;
+    private int b_view;
     private String b_img;
     private String b_realimg;
 

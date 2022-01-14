@@ -5,82 +5,96 @@
     <title>Title</title>
 </head>
 <body>
-    <div th:replace="header.html::header"> </div>
-    <div class="container">
-        <!-- session을 호출해 logindto가 null이 아닐경우에만 글쓰기 버튼 가능 -->
-        <div th:if="${session.logindto == null}"> 로그인후 글쓰기 가능합니다. </div>
-        <a th:if="${session.logindto != null}" th:href="@{/board/boardwrite}"><button class="btn btn-primary">글 쓰기</button></a>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>순번</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>날짜</th>
-                    <th>조회수</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="boardDto : ${BoardDtos}">
-                    <!-- for( 클래스명 객체명 : 리스트명 ) -->
-                    <td th:text="${boardDto.b_num}"></td>
-                    <!-- 제목에 하이퍼링크 걸기 td를 하이퍼링크로 설정할 수는 없어서 span을 이용해 제목을 출력 후 a태그를 사용한다. -->
-                    <td><!-- <a th:href="@{'/기존경로/URL' + ${변수} }"> -->
-                        <a th:href="@{'/board/boardview/' + ${boardDto.b_num} }"> <!-- URL을 요청할때는 맨 앞에 /를 넣어야 한다. -->
-                        <span th:text="${boardDto.b_title}"></span>
-                        </a>
-                    </td>
-                    <td th:text="${boardDto.b_writer}"></td>
-                    <td th:text="${boardDto.createdDate}"></td>
-                    <td th:text="${boardDto.b_view}"></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div th:replace="header.html::header"></div>
+<div class="container">
+    <!-- session을 호출해 logindto가 null이 아닐경우에만 글쓰기 버튼 가능 -->
+    <div th:if="${session.logindto == null}"> 로그인후 글쓰기 가능합니다.</div>
+    <a th:if="${session.logindto != null}" th:href="@{/board/boardwrite}">
+        <button class="btn btn-primary">글 쓰기</button>
+    </a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>순번</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>날짜</th>
+            <th>조회수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="boardDto : ${BoardDtos}">
+            <!-- for( 클래스명 객체명 : 리스트명 ) -->
+            <td th:text="${boardDto.bnum}"></td>
+            <!-- 제목에 하이퍼링크 걸기 td를 하이퍼링크로 설정할 수는 없어서 span을 이용해 제목을 출력 후 a태그를 사용한다. -->
+            <td><!-- <a th:href="@{'/기존경로/URL' + ${변수} }"> -->
+                <a th:href="@{'/board/boardview/' + ${boardDto.bnum} }"> <!-- URL을 요청할때는 맨 앞에 /를 넣어야 한다. -->
+                    <span th:text="${boardDto.b_title}"></span>
+                </a>
+            </td>
+            <td th:text="${boardDto.b_writer}"></td>
+            <td th:text="${#temporals.format(boardDto.createdDate,'MM-dd hh:mm')}"></td>
+                                    <!-- #temporals.format(값, 변경할 형식) -->
+            <td th:text="${boardDto.b_view}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
-    <!-- 타임리프 변수 정의
-            th:with = 변수명 = 값
-            시작페이지번호 = 모델명.number/ 10 * 10 +1
-            끝페이지번호 = 시작페이지번호 + 9 < 모델명.전체페이지수 ? 시작페이지번호 + 9 : 모델명.전체페이지수
-                // 조건 ? 참 : 거짓
-            -->
-    <ul class="pagination justify-content-center"
-        th:with="start=${T(Math).floor(BoardDtos.number/10)*10+1},
+<!-- 타임리프 변수 정의
+        th:with = 변수명 = 값
+        시작페이지번호 = 모델명.number/ 10 * 10 +1
+        끝페이지번호 = 시작페이지번호 + 9 < 모델명.전체페이지수 ? 시작페이지번호 + 9 : 모델명.전체페이지수
+            // 조건 ? 참 : 거짓
+        -->
+<ul class="pagination justify-content-center"
+    th:with="start=${T(Math).floor(BoardDtos.number/10)*10+1},
                     last= (${start+9 < BoardDtos.totalPages ? start+9:BoardDtos.totalPages})"> <!-- 페이지번호 넘기기 -->
 
-        <li class="page-item">    <!-- 첫 페이지 -->
-            <a class="page-link" th:href="@{/board/boardlist(page=1)}"> << </a>
-        </li>
+    <li class="page-item">    <!-- 첫 페이지 -->
+        <a class="page-link" th:href="@{/board/boardlist(page=1)}"> << </a>
+    </li>
 
-        <li class="page-item">    <!-- 이전페이지 -->
-            <a class="page-link" th:href="@{/board/boardlist(page=${BoardDtos.number})}"> < </a>
-        </li>
+    <li class="page-item" th:class="${BoardDtos.first}? 'disabled'">    <!-- 이전페이지 -->
+        <!-- 만약에 현페이지가 첫페이지면 이전페이지 표시 x -->
+        <a class="page-link" th:href="${BoardDtos.first}?'#':@{/board/boardlist(page=${BoardDtos.number})}"> < </a>
+    </li>
 
-        <!-- 페이지 목록 -->
-        <li class="page-item" th:each="page:${#numbers.sequence(start, last) }"> <!-- th:each = "변수명":${#numbers.sequence(시작번호, 마지막번호) } -->
-            <a class="page-link" th:href="@{/board/boardlist(page=${page})}" th:text="${page}">1</a>
-        </li>
+    <!-- 페이지 목록 -->
+    <li class="page-item" th:each="page:${#numbers.sequence(start, last) }">
+        <!-- th:each = "변수명":${#numbers.sequence(시작번호, 마지막번호) } -->
+        <a class="page-link" th:href="@{/board/boardlist(page=${page})}" th:text="${page}">1</a>
+    </li>
 
-        <li class="page-item">    <!-- 다음 페이지 -->
-            <a class="page-link"th:href="@{/board/boardlist(page=${BoardDtos.number+2})}"> > </a>
-        </li>
+    <li class="page-item" th:class="${BoardDtos.last}? 'disabled'">    <!-- 다음 페이지 -->
+        <!-- 만약에 현페이지가 마지막 페이지면 이전페이지 표시 x -->
+        <a class="page-link" th:href="${BoardDtos.last}?'#':@{/board/boardlist(page=${BoardDtos.number+2})}"> > </a>
+    </li>
 
-        <!-- 마지막페이지 -->
-        <li class="page-item">    <!-- 이전페이지 -->
-            <a class="page-link" th:href="@{/board/boardlist(page=${BoardDtos.totalPages})}"> >> </a>
-        </li>
-    </ul>
-    <!-- 검색창 -->
+    <!-- 마지막페이지 -->
+    <li class="page-item">    <!-- 마지막 페이지 -->
+        <a class="page-link" th:href="@{/board/boardlist(page=${BoardDtos.totalPages})}"> >> </a>
+    </li>
+</ul>
+<!-- 검색창 -->
+
     <form class="justify-content-center" action="/board/boardlist" method="get">
-        <select name="keyword" id="">
-            <option value="b_title">제목</option>
-            <option value="b_content">내용</option>
-            <option value="b_writer">작성자</option>
-        </select>
-        <input type="type" name="search">
-        <input type="submit" value="검색" class="btn btn-info">
-
-
+        <div class="row">
+            <div class="col-md-2">
+                <select name="keyword" id="">
+                    <option value="b_title">제목</option>
+                    <option value="b_content">내용</option>
+                    <option value="b_writer">작성자</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="type" name="search">
+            </div>
+            <div class="col-md-2">
+                <input type="submit" value="검색" class="btn btn-info">
+            </div>
+        </div>
     </form>
+
 </body>
 </html>

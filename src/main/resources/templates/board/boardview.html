@@ -14,8 +14,8 @@
     <div th:text="${boardDto.b_writer}"></div>
     <div th:text="${boardDto.b_view}"></div>
     <div th:text="${boardDto.b_createdDate}"></div>
-    <img th:src="@{ ${boardDto.b_img} }">
-    <img th:src="@{'/upload/'+${boardDto.b_img} }">
+
+<!--    <img th:src="@{'/upload/'+${boardDto.b_img} }">-->
     <a th:href="@{/board/filedownload(b_img=${boardDto.b_img})}" th:text="${boardDto.b_realimg}"></a> <!-- /board/filedownload(b_img=${boardDto.b_img}) 이렇게도 가능 -->
 
 
