@@ -86,7 +86,7 @@ public class BoardService {
     @Autowired
     HttpServletRequest request;
     // boardview 출력
-    @Transactional  //Read 빼고는 다 넣는다.
+    @Transactional  //CRUD중 Read 빼고는 다 넣는다.
     public BoardDto getboard(int b_num) {
 
         Optional<BoardEntity> entityOptional = boardRepository.findById(b_num);
