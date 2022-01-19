@@ -2,9 +2,14 @@ package ansan.domain.entity.Member;
 
 
 import ansan.domain.entity.BaseTimeEntity;
+import ansan.domain.entity.Board.BoardEntity;
+import ansan.domain.entity.Reply.ReplyEntity;
+import ansan.domain.entity.Room.RoomEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity // DB내 테이블과 연결
 @Table( name = "member") // 테이블 속성
@@ -38,5 +43,13 @@ public class MemberEntity extends BaseTimeEntity {
     @Column
     private String m_grade; // 등급
 
+    @OneToMany(mappedBy = "memberEntity")
+    private List<BoardEntity> boardEntities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "memberEntity")
+    private List<ReplyEntity> replyEntities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "memberEntity")
+    private List<RoomEntity> roomEntities = new ArrayList<>();
     
 }

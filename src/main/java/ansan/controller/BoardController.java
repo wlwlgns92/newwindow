@@ -4,6 +4,7 @@ package ansan.controller;
 import ansan.domain.dto.BoardDto;
 import ansan.domain.dto.MemberDto;
 import ansan.domain.entity.Board.BoardEntity;
+import ansan.domain.entity.Reply.ReplyEntity;
 import ansan.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -75,7 +77,7 @@ public class BoardController {
         //객체화
         File file = new File(path);
         try {
-            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(b_img.split("_")[1], "UTF-8") );
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(b_img.split("_")[1], "UTF-8"));
             //파일 객체 내보내기
             OutputStream outputStream = response.getOutputStream();
             //내보내기할 대상 읽어오기 [ 파일 읽기 ]
@@ -100,6 +102,10 @@ public class BoardController {
             boardDto.setB_realimg(boardDto.getB_img().split("_")[1]);
         }
         model.addAttribute("boardDto", boardDto);
+        // 해당 게시물번호의 댓글 호출
+        List<ReplyEntity> replyEntitys = boardService.getreplylist(b_num);
+        model.addAttribute("replyEntitys", replyEntitys);
+
         return "board/boardview"; // 타임리프를 이용한 html 호출
     }
 
@@ -204,8 +210,32 @@ public class BoardController {
             boardService.boardupdate(
                     BoardDto.builder().b_num(b_num).b_title(b_title).b_content(b_content).b_img(b_img).build());
         }
-        return "board/boardview" + b_num;
+        return "redirect:/board/boardview/" + b_num;
+    }
+    // 댓글 작성
+    @ResponseBody
+    @GetMapping("/board/replywrite")
+    public String replywrite(@RequestParam("bnum") int bnum, @RequestParam("rcontent") String rcontent) {
+        HttpSession session = request.getSession();
+        MemberDto memberDto = (MemberDto) session.getAttribute("logindto");
+
+        boolean result = boardService.replywrite(bnum, rcontent, memberDto.getM_id());
+        if (result) {
+            return "1";
+        } else {
+            return "2";
+        }
     }
 
-
+    // 댓글삭제
+    @GetMapping("/board/replydelete")
+    @ResponseBody
+    public String replydelete(@RequestParam("rnum") int rnum) {
+        boolean result = boardService.replydelete(rnum);
+        if(result) {
+            return "1";
+        }else {
+            return "2";
+        }
+    }
 }

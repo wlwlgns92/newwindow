@@ -4,6 +4,8 @@ package ansan.service;
 import ansan.domain.dto.BoardDto;
 import ansan.domain.entity.Board.BoardEntity;
 import ansan.domain.entity.Board.BoardRepository;
+import ansan.domain.entity.Board.ReplyRepository;
+import ansan.domain.entity.Reply.ReplyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -144,5 +148,43 @@ public class BoardService {
             return false;
         }
     }
-    
+    @Autowired
+    ReplyRepository replyRepository;
+
+    public boolean replywrite(int bnum, String rcontent, String rwriter) {
+        Optional<BoardEntity> entityOptional = boardRepository.findById(bnum); // 게시물번호에 해당하는 엔티티 출력
+        ReplyEntity replyEntity = ReplyEntity.builder()
+                .rwriter(rwriter)
+                .rcontent(rcontent)
+                .boardEntity(entityOptional.get()) // 해당 게시물의 엔티티를 꼭 넣어야 관계맵핑이 성립
+                .build();
+        replyRepository.save(replyEntity); // 댓글 저장
+
+        // 해당 게시물내 댓글 저장 : 댓글을 게시물에 저장
+        entityOptional.get().getReplyEntity().add(replyEntity);
+        return true;
+    }
+
+    // 모든 댓글 출력
+    public List<ReplyEntity> getreplylist(int bnum) {
+
+        // 1. 해당 게시물번호의 엔티티 호출
+        Optional<BoardEntity> entityOptional = boardRepository.findById(bnum);
+        // 2. 해당 엔티티(댓글번호)의 댓글 리스트 호출
+        List<ReplyEntity> replyEntitys = entityOptional.get().getReplyEntity();
+
+        // 정렬후 내림차순
+        Collections.reverse(replyEntitys);
+        return replyEntitys;
+    }
+
+    //댓글 삭제
+    public boolean replydelete(int rnum) {
+        Optional<ReplyEntity> entityOptional = replyRepository.findById(rnum);
+        if(entityOptional != null ) {
+            replyRepository.delete(entityOptional.get());
+            return true;
+        }
+        return false;
+    }
 }

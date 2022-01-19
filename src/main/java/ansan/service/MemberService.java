@@ -167,4 +167,11 @@ public class MemberService {
             return false; // 다르면 false
         }
     }
+
+    // 회원번호 -> 회원 엔티티 반환
+    public MemberEntity getmentity(int mnum){
+        Optional<MemberEntity> entityOptional = memberRepository.findById(mnum);
+        return entityOptional.get();
+    }
+
 }
