@@ -150,7 +150,8 @@ public class BoardService {
     }
     @Autowired
     ReplyRepository replyRepository;
-
+    
+    //댓글 작성
     public boolean replywrite(int bnum, String rcontent, String rwriter) {
         Optional<BoardEntity> entityOptional = boardRepository.findById(bnum); // 게시물번호에 해당하는 엔티티 출력
         ReplyEntity replyEntity = ReplyEntity.builder()
