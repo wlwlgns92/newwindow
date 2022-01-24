@@ -35,7 +35,7 @@ public class BoardEntity extends BaseTimeEntity {
     private String b_img;
 
     // 여러개의 댓글을 저장할 리스트
-    @OneToMany(mappedBy = "boardEntity")
+    @OneToMany(mappedBy = "boardEntity", cascade = CascadeType.ALL)
     private List<ReplyEntity> replyEntity = new ArrayList<>();
 
     @ManyToOne// 다 : 1 연관 관계 맵핑

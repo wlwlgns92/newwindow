@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container">
+    <!-- 캐러셀 -->
+    <div th:id="${'carousel' +room.rnum}" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner"> <!-- 반복문 -->
+            <div class="carousel-item active">
+                <img th:src="@{'/roomimg/'+${room.roomimgEntities.get(0).rimg} }" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item" th:each="roomimg : ${room.roomimgEntities}">
+                <img th:src="@{'/roomimg/'+${roomimg.rimg} }"  class="d-block w-100" alt="...">
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" th:data-bs-target="${'#carousel'+room.rnum}"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" th:data-bs-target="${'#carousel'+room.rnum}"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <div>
+        <div>거래가 가능한 집입니다. <span th:text="${room.createdDate}"></span></div>
+        <div th:text="${room.rtrans + room.rprice}"></div>
+    </div>
+    <table class="table table-striped">
+        <tr>
+            <td width="40%">방번호</td> <td width="60%" th:text="${room.rnum}"></td> </tr>
+            <td width="40%">이름</td> <td th:text="${room.rname}"></td> </tr>
+            <td width="40%">가격</td> <td th:text="${room.rprice}"></td> </tr>
+            <td width="40%">면적</td> <td th:text="${room.rarea}"></td> </tr>
+            <td width="40%">관리비</td> <td th:text="${room.rmanagementfee}"></td> </tr>
+            <td width="40%">준공날짜</td> <td th:text="${room.rcompletiondate}"></td> </tr>
+            <td width="40%">입주가능일</td> <td th:text="${room.rindate}"></td> </tr>
+            <td width="40%">구조</td> <td th:text="${room.rstructure}"></td> </tr>
+            <td width="40%">층/건물층수</td> <td th:text="${room.rfloor}"></td> </tr>
+            <td width="40%">건물종류</td> <td th:text="${room.rkind}"></td> </tr>
+            <td width="40%">주소</td> <td th:text="${room.raddress}"></td> </tr>
+            <td width="40%">내용</td> <td th:text="${room.rcontents}"></td> </tr>
+            <td width="40%">상태</td> <td th:text="${room.ractive}"></td> </tr>
+            <td width="40%">거래방식</td> <td th:text="${room.rtrans}"></td> </tr>
+    </table>
+    <button class="form-control">문의하기</button>
+</div>
+</body>
+</html>
