@@ -32,8 +32,6 @@
             // 마커에 클릭 이벤트를 등록한다 (우클릭 : rightclick)
                   kakao.maps.event.addListener(marker, 'click', function() {
 
-
-
                     //사이드바 열기 < js에서 자동으로 버튼 클릭 이벤트 실행하기 [ 클릭하면 a태그를 클릭하지 않아도 자동으로 옆에 사이드바 실행 ] >
                     $("#sidebartoggle").trigger("click");
 
@@ -75,3 +73,25 @@
         // 지도를 클릭된 클러스터의 마커의 위치를 기준으로 확대합니다
         map.setLevel(level, {anchor: cluster.getCenter()});
     });
+
+    function notewrite(rnum) {
+    var ncontents = $("#ncontents").val();
+
+    $.ajax({
+        url: "/room/notewrite",
+        data: {"rnum" : rnum , "ncontents": ncontents},
+        success: function(data){
+            if(data == 1) {
+                alert("문의가 접수되었습니다.");
+                $("#ncontents").val("");
+                $("#notemodal").modal("hide");
+            }else {
+                alert("로그인후 문의 가능합니다.");
+                $("#ncontents").val("");
+                $("#notemdal").modal("hide");
+                $("#modallogin").modal("show");
+            }
+        }
+    });
+
+    }

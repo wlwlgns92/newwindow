@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -49,7 +50,25 @@
             <td width="40%">상태</td> <td th:text="${room.ractive}"></td> </tr>
             <td width="40%">거래방식</td> <td th:text="${room.rtrans}"></td> </tr>
     </table>
-    <button class="form-control">문의하기</button>
+    <button class="form-control" type="button" data-bs-target="#notemodal" data-bs-toggle="modal">문의하기</button>
+
+
+    <!-- room 문의 모달 -->
+    <div class="modal fade" tabindex="-1" id="notemodal" data-bs-keyboard="false" data-bs-backdrop="static" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="mb-0">방문의하기</h5>
+                    <p class="mb-0" id="notemsg">방 주인에게 문의하기</p>
+                    <textarea class="form-control" name="" id="ncontents"></textarea>
+                </div>
+                <div class="modal-footer flex-nowrap p-0">
+                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right" th:onclick="notewrite([[${room.rnum}]])"><strong>문의</strong></button>
+                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

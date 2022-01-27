@@ -3,6 +3,7 @@ package ansan.controller;
 
 import ansan.domain.dto.MemberDto;
 import ansan.service.MemberService;
+import ansan.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,9 @@ import javax.servlet.http.HttpSession;
 
 @Controller
 public class MemberController {
+
+    @Autowired
+    private RoomService roomService;
 
     @GetMapping("/member/login")
     public String login() {
@@ -153,6 +157,21 @@ public class MemberController {
         }else {
             return 2;
         }
+    }
+    // 방쪽지 확인 페이지
+    @GetMapping("/member/notelist")
+    public String notelist( Model model) {
+        model.addAttribute("rooms",roomService.getmyroomlist());
+        model.addAttribute("notes",roomService.getmynotelist());
+        return "member/notelist";
+    }
+
+    @GetMapping("/member/notereplywrite")
+    @ResponseBody
+    public String notereplywrite(@RequestParam("nnum") int nnum,
+                                 @RequestParam("nreply") String nreply) {
+        roomService.notereplywrite(nnum, nreply);
+        return "1";
     }
 
 }

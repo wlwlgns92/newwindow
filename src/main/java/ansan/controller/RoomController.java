@@ -18,6 +18,7 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
+
     @GetMapping("/write") // 이동
     public String write() {
         return "room/roomwrite";
@@ -49,7 +50,7 @@ public class RoomController {
 
         // {"positions": [ {"lat": 37.27943075229118,lng": 127.01763998406159} }
         // { "키" : 리스트{ "키": 값1 , "키":값2 , "키": 값3 } }
-        // jsonObject = { "positions" : jsonArray{ "키": 값1 , "키":값2 , "키": 값3 } }
+        // jsonObject = { "positions" : jsonArray{ ("키": 값1 , "키":값2 , "키": 값3) } }
         // map = { 키 : 값 }
         //   map객체 = { "키" : List[ map객체 , map객체 , map객체  ]  }
 
@@ -57,6 +58,7 @@ public class RoomController {
         JSONArray jsonArray = new JSONArray(); // json 안에 들어가는 리스트
 
         List<RoomEntity> roomlist = roomService.getroomlist();   // 모든 방 [ 위도 , 경도 포함 ]
+
         for (RoomEntity roomEntity : roomlist) { // 모든 방에서 하나씩 반복문 돌리기
 
             JSONObject data = new JSONObject(); // 리스트 안에 들어가는 키:값
@@ -66,6 +68,7 @@ public class RoomController {
             jsonArray.add(data); // 리스트에 저장
 
         }
+
         jsonObject.put("positions", jsonArray);  // json 전체에 리스트 넣기
 
         return jsonObject;
@@ -78,6 +81,26 @@ public class RoomController {
         model.addAttribute("room",roomService.getroom(rnum) );
 
         return "room/room";
+    }
+
+    //답변 등록
+    @GetMapping("/notewrite")
+    @ResponseBody
+    public String notewrite(@RequestParam("rnum") int rnum,
+                            @RequestParam("ncontents") String ncontents) {
+        boolean result = roomService.notewrite(rnum, ncontents);
+        if(result) {
+            return "1";
+        }else {
+            return "2";
+        }
+    }
+
+    // 읽음 처리 업데이트
+    @GetMapping("/nreadupdate")
+    @ResponseBody
+    public void nreadupdate(@RequestParam("nnum") int nnum) {
+        roomService.nreadupdate(nnum);
     }
 
 }

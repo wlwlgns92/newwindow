@@ -2,10 +2,7 @@ package ansan.service;
 
 import ansan.domain.dto.MemberDto;
 import ansan.domain.entity.Member.MemberEntity;
-import ansan.domain.entity.Room.RoomEntity;
-import ansan.domain.entity.Room.RoomRepository;
-import ansan.domain.entity.Room.RoomimgEntity;
-import ansan.domain.entity.Room.RoomimgRepository;
+import ansan.domain.entity.Room.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,11 +25,14 @@ public class RoomService {
     private MemberService memberService;
     @Autowired
     private RoomimgRepository roomimgRepository;
+    @Autowired
+    private NoteRepository noteRepository;
+
     // 저장
-    public boolean write(RoomEntity roomEntity , List<MultipartFile> files) {
+    public boolean write(RoomEntity roomEntity, List<MultipartFile> files) {
 
         HttpSession session = request.getSession();
-        MemberDto memberDto = (MemberDto)session.getAttribute("logindto");
+        MemberDto memberDto = (MemberDto) session.getAttribute("logindto");
         // 회원번호 -> 회원 엔티티 가져오기
         MemberEntity memberEntity = memberService.getmentity(memberDto.getM_num());
         // 룸 엔티티에 회원 엔티티 넣기
@@ -46,16 +46,18 @@ public class RoomService {
 
         //파일처리
         String uuidfile = null;
-        if(files.size() != 0) {
-            for(MultipartFile file : files) {
+        if (files.size() != 0) {
+            for (MultipartFile file : files) {
                 UUID uuid = UUID.randomUUID();
-                uuidfile = uuid.toString()+"_"+file.getOriginalFilename().replaceAll("-","-");
+                uuidfile = uuid.toString() + "_" + file.getOriginalFilename().replaceAll("-", "-");
 
                 String dir = "C:\\Users\\505\\newwindow\\src\\main\\resources\\static\\roomimg";
                 String filepath = dir + "\\" + uuidfile;
                 try {
                     file.transferTo(new File(filepath));
-                }catch(Exception e) { System.out.println("파일 저장 실패 : "+ e ); }
+                } catch (Exception e) {
+                    System.out.println("파일 저장 실패 : " + e);
+                }
 
                 // roomimg 엔티티 생성 [ 해당 room 엔티티 주입 ] 
                 RoomimgEntity roomimgEntity = RoomimgEntity.builder().rimg(uuidfile).roomEntity(roomEntitysaved).build();
@@ -86,14 +88,86 @@ public class RoomService {
 
     // 특정 룸 상태변경
     @Transactional
-    public boolean activeupdate(int rnum , String upactive) {
+    public boolean activeupdate(int rnum, String upactive) {
         RoomEntity roomEntity = roomRepository.findById(rnum).get();
-        if(roomEntity.getRactive().equals(upactive)) {
+        if (roomEntity.getRactive().equals(upactive)) {
             return false; // 선택 버튼의 상태와 기존 룸상태가 같으면 업데이트 x
-        }else {
-            roomEntity.setRactive(upactive); return true;
+        } else {
+            roomEntity.setRactive(upactive);
+            return true;
         }
     }
 
     // 수정
+
+    //문의 등록
+    public boolean notewrite(int rnum, String ncontents) {
+
+        HttpSession session = request.getSession();
+        MemberDto memberDto = (MemberDto) session.getAttribute("logindto");
+        if (memberDto == null) {
+            return false;
+        }
+        // 문의 엔티티 생성
+        NoteEntity noteEntity = new NoteEntity();
+        noteEntity.setNcontent(ncontents);
+        noteEntity.setMemberEntity(memberService.getmentity(memberDto.getM_num()));
+        noteEntity.setRoomEntity(roomRepository.findById(rnum).get());
+
+        //문의 엔티티 저장
+        int nnum = noteRepository.save(noteEntity).getNnum();
+        // 해당 룸엔티티의 문의리스트에 문의 엔티티 저장
+        roomRepository.findById(rnum).get().getNoteEntities().add(noteRepository.findById(nnum).get());
+        // 해당 회원엔티티의 문의리스트에 문의 엔티티 저장
+        memberService.getmentity(memberDto.getM_num()).getNoteEntities().add(noteRepository.findById(nnum).get());
+
+        return true;
+    }
+
+    // 로그인된 회원이 등록한 방 출력
+    public List<RoomEntity> getmyroomlist() {
+        HttpSession session = request.getSession();
+        MemberDto memberDto = (MemberDto) session.getAttribute("logindto");
+        MemberEntity memberEntity = memberService.getmentity(memberDto.getM_num());
+        return memberEntity.getRoomEntities();
+    }
+
+    // 로그인된 회원이 등록한 문의 출력
+    public List<NoteEntity> getmynotelist() {
+        HttpSession session = request.getSession();
+        MemberDto memberDto = (MemberDto) session.getAttribute("logindto");
+        MemberEntity memberEntity = memberService.getmentity(memberDto.getM_num());
+        return memberEntity.getNoteEntities();
+    }
+
+    //답변등록
+    @Transactional
+    public boolean notereplywrite(int nnum, String nreply){
+        noteRepository.findById(nnum).get().setNreply(nreply);
+        return true;
+    }
+    // read : 0 안읽음 1 : 읽음
+    public void nreadcount() {
+        HttpSession session = request.getSession();
+        MemberDto memberDto = (MemberDto)session.getAttribute("logindto");
+        if(memberDto == null ) return;
+
+        int nreadcount = 0; // 안읽은 쪽지의 개수
+
+        // 로그인된 회원번호와 쪽지 받은 사람의 회원번호가 모두 동일하면면
+       for(NoteEntity noteEntity : noteRepository.findAll()){
+            if(noteEntity.getRoomEntity().getMemberEntity().getM_num() == memberDto.getM_num()
+            && noteEntity.getNread() == 0) { nreadcount++; }
+        }
+       // 세션에 저장
+        session.setAttribute("nreadcount", nreadcount);
+    }
+
+    // 읽음 처리 서비스
+    @Transactional
+    public boolean nreadupdate(int nnum) {
+        noteRepository.findById(nnum).get().setNread(1);
+        return true;
+    }
+
 }
