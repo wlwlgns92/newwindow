@@ -67,22 +67,22 @@ public class MemberController {
         return "redirect:/"; // 회원가입 성공시 로그인페이지 맵핑
     }
 
-    @PostMapping("/member/logincontroller")
-    @ResponseBody // 타임임리프를 무시하는 어노테이션
-    public String logincontroller(@RequestBody MemberDto memberDto) { // @RequestBody 요청
-        // form 사용시에는 Dto에 자동주입이 되지만, json, ajax 사용시 자동주입 x
-
-        MemberDto loginDto = memberService.login(memberDto);
-        if (loginDto != null) {
-            HttpSession session = request.getSession(); // 서버내 세션 가져오기
-            session.setAttribute("logindto", loginDto);
-            return "1";
-        } else {
-            System.out.println("로그인 실패 ");
-            return "2";
-        }
-        // 타임리프를 설치했을경우 return URL, HTML 다른 값을 반환 할때는 @ResponseBody 사용
-    }
+//    @PostMapping("/member/logincontroller")
+//    @ResponseBody // 타임임리프를 무시하는 어노테이션
+//    public String logincontroller(@RequestBody MemberDto memberDto) { // @RequestBody 요청
+//        // form 사용시에는 Dto에 자동주입이 되지만, json, ajax 사용시 자동주입 x
+//
+//        MemberDto loginDto = memberService.login(memberDto);
+//        if (loginDto != null) {
+//            HttpSession session = request.getSession(); // 서버내 세션 가져오기
+//            session.setAttribute("logindto", loginDto);
+//            return "1";
+//        } else {
+//            System.out.println("로그인 실패 ");
+//            return "2";
+//        }
+//        // 타임리프를 설치했을경우 return URL, HTML 다른 값을 반환 할때는 @ResponseBody 사용
+//    }
 
     @GetMapping("/member/logout")
     public String logout() {

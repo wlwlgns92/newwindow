@@ -138,22 +138,22 @@ $(function(){
        });
 
        $("#formsubmit").click(function(){
-       if( $("idcheck").html() != "사용가능" ){
+       if( $("#idcheck").html() != "사용가능" ){
         alert("사용불가능한 아이디 입니다.");
        }
-       else if ($("pwcheck").html() != "사용가능") {
+       else if ($("#pwcheck").html() != "사용가능") {
        alert("사용불가능한 비밀번호 입니다.");
        }
-       else if ($("namecheck").html() != "사용가능" ) {
+       else if ($("#namecheck").html() != "사용가능" ) {
        alert("사용불가능한 이름입니다.");
        }
-       else if ($("phonecheck").html() != "사용가능" ) {
+       else if ($("#phonecheck").html() != "사용가능" ) {
        alert("사용불가능한 연락처입니다.");
        }
-       else if ($("emailcheck").html() != "사용가능" ) {
+       else if ($("#emailcheck").html() != "사용가능" ) {
        alert("사용불가능한 이메일 입니다.");
        }
-       else if ($("addresscheck").html() != "사용가능" ) {
+       else if ($("#addresscheck").html() != "사용가능" ) {
        alert("사용불가능한 주소입니다.");
        }else {
        $("input[type='submit']").prop("disabled", false);

@@ -1,23 +1,30 @@
 package ansan.service;
 
 
+import ansan.domain.dto.IntergratedDto;
 import ansan.domain.dto.MemberDto;
 import ansan.domain.entity.Member.MemberEntity;
 import ansan.domain.entity.Member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
 @Service
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
     @Autowired
     MemberRepository memberRepository;
@@ -34,21 +41,21 @@ public class MemberService {
         return true;
     }
 
-    //회원검사 메소드
-    public MemberDto login(MemberDto memberDto) {
-        List<MemberEntity> memberEntityList = memberRepository.findAll();
-
-        for (MemberEntity memberEntity : memberEntityList) {
-            if (memberEntity.getMid().equals(memberDto.getM_id()) &&
-                    memberEntity.getM_password().equals(memberDto.getM_password())) {
-                return MemberDto.builder()
-                        .m_id(memberEntity.getMid())
-                        .m_num(memberEntity.getM_num()).build();
-
-            }
-        }
-        return null;
-    }
+//    //회원검사 메소드
+//    public MemberDto login(MemberDto memberDto) {
+//        List<MemberEntity> memberEntityList = memberRepository.findAll();
+//
+//        for (MemberEntity memberEntity : memberEntityList) {
+//            if (memberEntity.getMid().equals(memberDto.getM_id()) &&
+//                    memberEntity.getM_password().equals(memberDto.getM_password())) {
+//                return MemberDto.builder()
+//                        .m_id(memberEntity.getMid())
+//                        .m_num(memberEntity.getM_num()).build();
+//
+//            }
+//        }
+//        return null;
+//    }
 
     // 회원 아이디 찾기
     public String findid(MemberDto memberDto) {
@@ -182,5 +189,15 @@ public class MemberService {
     }
 
 
+    @Override // 로그인처리 /member/logincontroller  URL 호출시 실행되는 메소드 [ 로그인 처리(인증처리) 메소드 ]
+    public UserDetails loadUserByUsername(String mid) throws UsernameNotFoundException {
+        Optional<MemberEntity> entityOptional = memberRepository.findBymid(mid);
+        MemberEntity memberEntity = entityOptional.orElse(null);
+                                                    // orElse(null) 만ㅇ약에 엔티티가 없으면 null
+        //찾은 회원엔티티의 권한[키]을 리스트에 담기
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(memberEntity.getRoleKey() ) );
 
+        return new IntergratedDto(memberEntity, authorities);
+    }
 }
