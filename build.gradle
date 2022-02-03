@@ -23,6 +23,7 @@ dependencies {  // 의존성 [ 라이브러리 추가하는 공간 ]
     developmentOnly 'org.springframework.boot:spring-boot-devtools' // 자동빌드 라이브러리
     implementation 'org.springframework.boot:spring-boot-starter-mail' // 자바메일 라이브러리;
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1' //10. json 라이브러리 제공
+    implementation 'org.springframework.boot:spring-boot-starter-security' // 스프링 시큐리티 [ 보안솔루션 ] 제공
 }
 
 test {

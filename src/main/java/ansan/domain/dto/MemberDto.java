@@ -2,6 +2,7 @@ package ansan.domain.dto;
 
 
 import ansan.domain.entity.Member.MemberEntity;
+import ansan.domain.entity.Member.Role;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -23,13 +24,13 @@ public class MemberDto {
     private String m_email; // 이메일
     private String m_address; // 주소
     private int m_point; // 포인트
-    private String m_grade; // 등급
+    private Role m_grade; // 등급
     private LocalDateTime m_createdDate;
 
-   // DTO -> Entity 변환  [ 빌더로 대체 가능 ]
+   // 회원가입시 : DTO -> Entity 변환  [ 빌더로 대체 가능 ]
     public MemberEntity toentity() {
         return MemberEntity.builder()
-        .m_id(this.m_id)
+        .mid(this.m_id)
         .m_password(this.m_password)
                 .m_name(this.m_name)
                 .m_sex(this.m_sex)
@@ -37,8 +38,9 @@ public class MemberDto {
                 .m_email(this.m_email)
                 .m_point(this.m_point)
                 .m_address(this.m_address)
-                .m_grade(this.m_grade)
+                .m_grade(Role.MEMBER) // 회원가입시 기본으로 MEMBER 등급 권한 부여
                 .build();
+
 
     }
 

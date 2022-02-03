@@ -7,6 +7,7 @@ import ansan.domain.entity.Member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
@@ -23,6 +24,12 @@ public class MemberService {
 
     // 회원등록 메소드
     public boolean membersignup(MemberDto memberDto) {
+        // 패스워드 암호화 [ BCryptPasswordEncoder ]
+        // 1. 암호화 클래스 객체 생성
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        // 2. 입력받은 memberDto내 패스워드 재설정 [ 암호화객체명.encode(입력받은 패스워드)
+        memberDto.setM_password(passwordEncoder.encode(memberDto.getM_password() ) );
+
         memberRepository.save(memberDto.toentity()); // save(entity) : insert , update
         return true;
     }
@@ -32,10 +39,10 @@ public class MemberService {
         List<MemberEntity> memberEntityList = memberRepository.findAll();
 
         for (MemberEntity memberEntity : memberEntityList) {
-            if (memberEntity.getM_id().equals(memberDto.getM_id()) &&
+            if (memberEntity.getMid().equals(memberDto.getM_id()) &&
                     memberEntity.getM_password().equals(memberDto.getM_password())) {
                 return MemberDto.builder()
-                        .m_id(memberEntity.getM_id())
+                        .m_id(memberEntity.getMid())
                         .m_num(memberEntity.getM_num()).build();
 
             }
@@ -52,7 +59,7 @@ public class MemberService {
             // 만약에 해당 엔티티가 이름과 이메일이 동일하면
             if (memberEntity.getM_name().equals(memberDto.getM_name()) &&
                     memberEntity.getM_email().equals(memberDto.getM_email())) {
-                return memberEntity.getM_id(); // 아이디를 반환
+                return memberEntity.getMid(); // 아이디를 반환
             }
         }
         return null; // 못찾았을때
@@ -67,7 +74,7 @@ public class MemberService {
         // 반복문 이용한 모든 엔티티를 하나씩 꺼내보기
         for (MemberEntity memberEntity : memberEntities) {
             // 만약에 해당 엔티티가 이름과 이메일이 동일하면
-            if (memberEntity.getM_id().equals(memberDto.getM_id()) &&
+            if (memberEntity.getMid().equals(memberDto.getM_id()) &&
                     memberEntity.getM_email().equals(memberDto.getM_email())) {
 
                 String from = "slal4952@naver.com"; // 보내는사람
@@ -114,7 +121,7 @@ public class MemberService {
         // 모든 엔티티 반복문 돌려서 엔티티 하나씩 가져오기
         for(MemberEntity memberEntity : memberEntities) {
             //만약에  해당 엔티티가 입력한 아이디와 동일하면
-            if(memberEntity.getM_id().equals(m_id)) {
+            if(memberEntity.getMid().equals(m_id)) {
                 return true; // 중복
             }
         }
@@ -142,7 +149,7 @@ public class MemberService {
         // 찾은 엔티티를 dto로 변경후 반환
         MemberDto memberDto = new MemberDto();
         return memberDto.builder()
-                .m_id(memberEntity.get().getM_id())
+                .m_id(memberEntity.get().getMid())
                 .m_email(memberEntity.get().getM_email())
                 .m_grade(memberEntity.get().getM_grade())
                 .m_name(memberEntity.get().getM_name())

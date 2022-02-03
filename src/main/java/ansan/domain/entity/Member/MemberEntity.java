@@ -26,23 +26,35 @@ public class MemberEntity extends BaseTimeEntity {
     private int m_num; // 회원번호
 
     @Column
-    private String m_id;  // 회원아이디
+    private String mid;  // 회원아이디
+
     @Column
     private String m_password; // 비밀번호
+
     @Column
     private String m_name; // 이름
+
     @Column
     private String m_sex; // 성별
+
     @Column
     private String m_phone; // 연락처
+
     @Column
     private String m_email; // 이메일
+
     @Column
     private String m_address; // 주소
+
     @Column
     private int m_point; // 포인트
+
+    @Enumerated(EnumType.STRING) // DB는 Role이라는 자료형이 없어서 Enum 타입을 Jpa가 String 값으로 인식가능하도록 String 자료형으로 변환
     @Column
-    private String m_grade; // 등급
+    private Role m_grade; // 등급 만들어놓은 Role(enum) 설정
+
+    //해당 Role의 key를 반환하는 메소드
+    public String getRoleKey() { return this.m_grade.getKey(); }
 
     @OneToMany(mappedBy = "memberEntity")
     private List<BoardEntity> boardEntities = new ArrayList<>();
