@@ -41,7 +41,7 @@ public class MemberEntity extends BaseTimeEntity {
     private String m_phone; // 연락처
 
     @Column
-    private String m_email; // 이메일
+    private String memail; // 이메일
 
     @Column
     private String m_address; // 주소
@@ -68,5 +68,11 @@ public class MemberEntity extends BaseTimeEntity {
     //문의 리스트
     @OneToMany(mappedBy = "memberEntity")
     private List<NoteEntity> noteEntities = new ArrayList<>();
-    
+
+
+    // oauth에서 동일한 이메일이면 업데이트 처리 메소드
+    public MemberEntity update(String name) {
+        this.m_name = name;
+        return this;
+    }
 }

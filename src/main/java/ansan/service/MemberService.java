@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class MemberService implements UserDetailsService {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    HttpServletRequest request;
     // 회원등록 메소드
     public boolean membersignup(MemberDto memberDto) {
         // 패스워드 암호화 [ BCryptPasswordEncoder ]
@@ -65,7 +69,7 @@ public class MemberService implements UserDetailsService {
         for (MemberEntity memberEntity : memberEntities) {
             // 만약에 해당 엔티티가 이름과 이메일이 동일하면
             if (memberEntity.getM_name().equals(memberDto.getM_name()) &&
-                    memberEntity.getM_email().equals(memberDto.getM_email())) {
+                    memberEntity.getMemail().equals(memberDto.getM_email())) {
                 return memberEntity.getMid(); // 아이디를 반환
             }
         }
@@ -82,10 +86,10 @@ public class MemberService implements UserDetailsService {
         for (MemberEntity memberEntity : memberEntities) {
             // 만약에 해당 엔티티가 이름과 이메일이 동일하면
             if (memberEntity.getMid().equals(memberDto.getM_id()) &&
-                    memberEntity.getM_email().equals(memberDto.getM_email())) {
+                    memberEntity.getMemail().equals(memberDto.getM_email())) {
 
                 String from = "slal4952@naver.com"; // 보내는사람
-                String to = memberEntity.getM_email(); // 받는 사람
+                String to = memberEntity.getMemail(); // 받는 사람
                 String subject = "Ansan 계정 임시 비밀번호 발송"; // 제목
                 StringBuilder body = new StringBuilder(); // StringBuilder 문자열 연결 클래스 [ 문자열1 + 문자열 2 ]
                 body.append("<html> <body> <h1>Ansan 계정 임시 비밀번호<h1>"); // 보내는 메시지에 html 추가
@@ -139,7 +143,7 @@ public class MemberService implements UserDetailsService {
     public boolean emailcheck ( String m_email) {
         List<MemberEntity> memberEntities = memberRepository.findAll();
         for(MemberEntity memberEntity : memberEntities) {
-            if(memberEntity.getM_email().equals(m_email)) {
+            if(memberEntity.getMemail().equals(m_email)) {
                 return true;
             }
         }
@@ -157,7 +161,7 @@ public class MemberService implements UserDetailsService {
         MemberDto memberDto = new MemberDto();
         return memberDto.builder()
                 .m_id(memberEntity.get().getMid())
-                .m_email(memberEntity.get().getM_email())
+                .m_email(memberEntity.get().getMemail())
                 .m_grade(memberEntity.get().getM_grade())
                 .m_name(memberEntity.get().getM_name())
                 .m_phone(memberEntity.get().getM_phone())
@@ -197,6 +201,16 @@ public class MemberService implements UserDetailsService {
         //찾은 회원엔티티의 권한[키]을 리스트에 담기
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(memberEntity.getRoleKey() ) );
+        
+        // 세션 부여
+        MemberDto loginDto = MemberDto.builder()
+                .m_id(memberEntity.getMid())
+                .m_num(memberEntity.getM_num())
+                .build();
+
+            HttpSession session = request.getSession(); // 서버내 세션 가져오기
+            session.setAttribute("logindto", loginDto);
+
 
         return new IntergratedDto(memberEntity, authorities);
     }

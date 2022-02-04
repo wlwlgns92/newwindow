@@ -25,6 +25,7 @@ dependencies {  // 의존성 [ 라이브러리 추가하는 공간 ]
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1' //10. json 라이브러리 제공
     implementation 'org.springframework.boot:spring-boot-starter-security' // 스프링 시큐리티 [ 보안솔루션 ] 제공
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5' // 타임리프 시큐리티 제공 [ sec : ]
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // oauth2 [ 소셜 로그인 ] 설치
 }
 
 test {

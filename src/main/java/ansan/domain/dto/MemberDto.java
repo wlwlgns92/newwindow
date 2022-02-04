@@ -35,7 +35,7 @@ public class MemberDto {
                 .m_name(this.m_name)
                 .m_sex(this.m_sex)
                 .m_phone(this.m_phone)
-                .m_email(this.m_email)
+                .memail(this.m_email)
                 .m_point(this.m_point)
                 .m_address(this.m_address)
                 .m_grade(Role.MEMBER) // 회원가입시 기본으로 MEMBER 등급 권한 부여

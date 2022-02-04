@@ -23,4 +23,7 @@ public class IndexController {
     @ResponseBody
     public void nreadcount() { roomService.nreadcount();}
 
+    @GetMapping("/error")
+    public String error() { return "error"; }
+
 }
